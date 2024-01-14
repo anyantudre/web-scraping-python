@@ -12,16 +12,15 @@ def scrape_quotes():
     while url:
         resp = requests.get(f"{BASE_URL}{url}")
         print(f"Now Scraping {BASE_URL}{url} ......")
-        #print(resp.text)
+        
         soup = BeautifulSoup(resp.text, "html.parser")
         quotes = soup.find_all(class_="quote")
-        #print(quotes)
 
         for quote in quotes:
             text   = quote.find(class_="text").get_text()
             author = quote.find(class_="author").get_text()
             bio    = quote.find("a")["href"]
-            #print(bio)
+            
             all_quotes.append({
                 "text": text,
                 "author": author,
@@ -30,7 +29,7 @@ def scrape_quotes():
 
         next_btn = soup.find(class_="next")
         url = next_btn.find("a")["href"] if next_btn else None
-        #sleep(2)
+        sleep(2)
 
     return all_quotes
     
@@ -43,7 +42,7 @@ def start_game(quotes):
     print(quote["author"])
 
     while guess.lower() != quote["author"].lower() and remaining_guesses > 0:
-        guess = input(f"Who said this quote? Guesses remaining: {remaining_guesses} \n")
+        guess = input(f"Who said this quote? \n Guesses remaining: {remaining_guesses} \n")
         remaining_guesses -= 1
 
         if guess.lower() == quote["author"].lower():
@@ -52,7 +51,6 @@ def start_game(quotes):
         elif remaining_guesses == 3:
             res  = requests.get(f"{BASE_URL}{quote['bio']}")
             soup = BeautifulSoup(res.text, "html.parser")
-            #print(soup.body)
             birth_date = soup.find(class_="author-born-date").get_text()
             birth_location = soup.find(class_="author-born-location").get_text()
             print(f"Here's a hint for you : The author was born on {birth_date} {birth_location}")
@@ -65,7 +63,7 @@ def start_game(quotes):
             last_inital = quote['author'].split(" ")[1][0]
             print(f"Here's a hint : The author's last name starts with: {last_inital}")
         else: 
-            print(f"Sorry you ran out of guesses. The answer was {quote['author']}")
+            print(f"Sorry you ran out of guesses.\n The answer was {quote['author']}")
 
     again = " "
     while again.lower() not in ('y', 'yes', 'n', 'no'):
